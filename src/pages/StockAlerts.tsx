@@ -1,5 +1,5 @@
 import { AlertTriangle, Bell, Package, TrendingDown } from 'lucide-react';
-import { AppLayout } from '@/components/layout/AppLayout';
+import { MobileLayout } from '@/components/layout/MobileLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -14,22 +14,22 @@ export default function StockAlerts() {
   const getSeverityStyles = (severity: string) => {
     switch (severity) {
       case 'critical':
-        return 'bg-destructive text-destructive-foreground';
+        return 'bg-destructive/10 text-destructive';
       case 'warning':
-        return 'bg-warning text-warning-foreground';
+        return 'bg-warning/10 text-warning';
       default:
-        return 'bg-info text-info-foreground';
+        return 'bg-info/10 text-info';
     }
   };
 
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
       case 'critical':
-        return <AlertTriangle className="w-5 h-5" />;
+        return <AlertTriangle className="w-5 h-5 text-destructive" />;
       case 'warning':
-        return <TrendingDown className="w-5 h-5" />;
+        return <TrendingDown className="w-5 h-5 text-warning" />;
       default:
-        return <Bell className="w-5 h-5" />;
+        return <Bell className="w-5 h-5 text-info" />;
     }
   };
 
@@ -40,152 +40,101 @@ export default function StockAlerts() {
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffHours / 24);
 
-    if (diffDays > 0) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-    if (diffHours > 0) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    if (diffDays > 0) return `${diffDays}d ago`;
+    if (diffHours > 0) return `${diffHours}h ago`;
     return 'Just now';
   };
 
   return (
-    <AppLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-fade-in">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-              <AlertTriangle className="w-7 h-7 text-warning" />
-              Stock Alerts
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Monitor items that need immediate attention
-            </p>
-          </div>
-        </div>
-
+    <MobileLayout title="Stock Alerts">
+      <div className="p-4 space-y-4">
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <Card className="card-shadow hover-lift animate-slide-up border-l-4 border-l-destructive">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground font-medium">Critical</p>
-                  <p className="text-3xl font-bold text-foreground mt-1">{criticalCount}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Out of stock items</p>
-                </div>
-                <div className="p-3 rounded-lg bg-destructive/10">
-                  <AlertTriangle className="w-6 h-6 text-destructive" />
-                </div>
+        <div className="grid grid-cols-3 gap-3 animate-fade-in">
+          <Card className="card-shadow">
+            <CardContent className="p-3 text-center">
+              <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-2">
+                <AlertTriangle className="w-5 h-5 text-destructive" />
               </div>
+              <p className="text-2xl font-bold text-foreground">{criticalCount}</p>
+              <p className="text-[10px] text-muted-foreground">Critical</p>
             </CardContent>
           </Card>
-
-          <Card
-            className="card-shadow hover-lift animate-slide-up border-l-4 border-l-warning"
-            style={{ animationDelay: '100ms' }}
-          >
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground font-medium">Warning</p>
-                  <p className="text-3xl font-bold text-foreground mt-1">{warningCount}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Low stock items</p>
-                </div>
-                <div className="p-3 rounded-lg bg-warning/10">
-                  <TrendingDown className="w-6 h-6 text-warning" />
-                </div>
+          <Card className="card-shadow">
+            <CardContent className="p-3 text-center">
+              <div className="w-10 h-10 rounded-full bg-warning/10 flex items-center justify-center mx-auto mb-2">
+                <TrendingDown className="w-5 h-5 text-warning" />
               </div>
+              <p className="text-2xl font-bold text-foreground">{warningCount}</p>
+              <p className="text-[10px] text-muted-foreground">Warning</p>
             </CardContent>
           </Card>
-
-          <Card
-            className="card-shadow hover-lift animate-slide-up border-l-4 border-l-primary"
-            style={{ animationDelay: '200ms' }}
-          >
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground font-medium">Total Alerts</p>
-                  <p className="text-3xl font-bold text-foreground mt-1">{stockAlerts.length}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Requiring attention</p>
-                </div>
-                <div className="p-3 rounded-lg bg-primary/10">
-                  <Bell className="w-6 h-6 text-primary" />
-                </div>
+          <Card className="card-shadow">
+            <CardContent className="p-3 text-center">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
+                <Bell className="w-5 h-5 text-primary" />
               </div>
+              <p className="text-2xl font-bold text-foreground">{stockAlerts.length}</p>
+              <p className="text-[10px] text-muted-foreground">Total</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Alerts List */}
-        <Card className="card-shadow animate-slide-up" style={{ animationDelay: '300ms' }}>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Active Alerts</CardTitle>
-            <CardDescription>Items that need to be restocked</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {stockAlerts.map((alert, index) => {
-              const item = inventoryItems.find(
-                (i) => i.name.toLowerCase() === alert.itemName.toLowerCase()
-              );
-              return (
-                <div
-                  key={alert.id}
-                  className={cn(
-                    'flex items-center gap-4 p-4 rounded-lg border transition-all duration-200 hover:shadow-md animate-fade-in',
-                    alert.severity === 'critical'
-                      ? 'border-destructive/30 bg-destructive/5'
-                      : 'border-warning/30 bg-warning/5'
-                  )}
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <div
-                    className={cn(
-                      'p-3 rounded-lg',
-                      alert.severity === 'critical' ? 'bg-destructive/10' : 'bg-warning/10'
-                    )}
-                  >
+        <div className="space-y-3">
+          <h3 className="font-semibold text-foreground animate-fade-in">Active Alerts</h3>
+          {stockAlerts.map((alert, index) => (
+            <Card
+              key={alert.id}
+              className={cn(
+                'card-shadow animate-slide-up active:scale-[0.98] transition-transform',
+                alert.severity === 'critical' && 'border-l-4 border-l-destructive',
+                alert.severity === 'warning' && 'border-l-4 border-l-warning'
+              )}
+              style={{ animationDelay: `${index * 50}ms` }}
+            >
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className={cn(
+                    'p-2 rounded-xl flex-shrink-0',
+                    alert.severity === 'critical' ? 'bg-destructive/10' : 'bg-warning/10'
+                  )}>
                     {getSeverityIcon(alert.severity)}
                   </div>
-
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="font-semibold text-foreground">{alert.itemName}</p>
-                      <Badge className={cn('text-xs', getSeverityStyles(alert.severity))}>
-                        {alert.severity}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between text-sm mb-1">
-                          <span className="text-muted-foreground">
-                            Stock: {alert.currentStock} / {alert.minStock}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {formatTime(alert.createdAt)}
-                          </span>
-                        </div>
-                        <Progress
-                          value={(alert.currentStock / alert.minStock) * 100}
-                          className={cn(
-                            'h-2',
-                            alert.severity === 'critical'
-                              ? '[&>div]:bg-destructive'
-                              : '[&>div]:bg-warning'
-                          )}
-                        />
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div>
+                        <p className="font-semibold text-foreground">{alert.itemName}</p>
+                        <Badge className={cn('text-[10px] mt-1', getSeverityStyles(alert.severity))}>
+                          {alert.severity}
+                        </Badge>
                       </div>
+                      <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                        {formatTime(alert.createdAt)}
+                      </span>
                     </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>Stock: {alert.currentStock} / {alert.minStock}</span>
+                      </div>
+                      <Progress
+                        value={(alert.currentStock / alert.minStock) * 100}
+                        className={cn(
+                          'h-1.5',
+                          alert.severity === 'critical' ? '[&>div]:bg-destructive' : '[&>div]:bg-warning'
+                        )}
+                      />
+                    </div>
+                    <Button size="sm" variant="outline" className="mt-3 h-8 text-xs w-full">
+                      <Package className="w-3 h-3 mr-1" />
+                      Reorder
+                    </Button>
                   </div>
-
-                  <Button size="sm" variant="outline" className="hover-glow shrink-0">
-                    <Package className="w-4 h-4 mr-2" />
-                    Reorder
-                  </Button>
                 </div>
-              );
-            })}
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
-    </AppLayout>
+    </MobileLayout>
   );
 }
