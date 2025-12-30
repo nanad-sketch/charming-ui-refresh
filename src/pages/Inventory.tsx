@@ -1,44 +1,34 @@
 import { useState } from 'react';
-import { Search, Filter, Package } from 'lucide-react';
-import { AppLayout } from '@/components/layout/AppLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Search, Package, Plus } from 'lucide-react';
+import { MobileLayout } from '@/components/layout/MobileLayout';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { inventoryItems } from '@/data/sampleData';
 import { cn } from '@/lib/utils';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 
 export default function Inventory() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [activeFilter, setActiveFilter] = useState('all');
 
-  const categories = ['all', ...new Set(inventoryItems.map((item) => item.category))];
-  const statuses = ['all', 'in-stock', 'low-stock', 'out-of-stock'];
+  const filters = ['all', 'in-stock', 'low-stock', 'out-of-stock'];
 
   const filteredItems = inventoryItems.filter((item) => {
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = categoryFilter === 'all' || item.category === categoryFilter;
-    const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
-    return matchesSearch && matchesCategory && matchesStatus;
+    const matchesFilter = activeFilter === 'all' || item.status === activeFilter;
+    return matchesSearch && matchesFilter;
   });
 
   const getStatusStyles = (status: string) => {
     switch (status) {
       case 'in-stock':
-        return 'bg-success text-success-foreground';
+        return 'bg-success/10 text-success';
       case 'low-stock':
-        return 'bg-warning text-warning-foreground';
+        return 'bg-warning/10 text-warning';
       case 'out-of-stock':
-        return 'bg-destructive text-destructive-foreground';
+        return 'bg-destructive/10 text-destructive';
       default:
         return 'bg-muted text-muted-foreground';
     }
@@ -49,169 +39,104 @@ export default function Inventory() {
   };
 
   return (
-    <AppLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-fade-in">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-              <Package className="w-7 h-7 text-primary" />
-              Inventory Management
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Track and manage your inventory items
-            </p>
-          </div>
-          <Button className="hover-glow">
-            <Package className="w-4 h-4 mr-2" />
-            Add Item
-          </Button>
+    <MobileLayout title="Inventory">
+      <div className="p-4 space-y-4">
+        {/* Search */}
+        <div className="relative animate-fade-in">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Search items..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 h-11 rounded-xl"
+          />
         </div>
 
-        {/* Filters */}
-        <Card className="card-shadow animate-slide-up">
-          <CardContent className="p-4">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search items..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              <div className="flex gap-3">
-                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                  <SelectTrigger className="w-[150px]">
-                    <Filter className="w-4 h-4 mr-2" />
-                    <SelectValue placeholder="Category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category === 'all' ? 'All Categories' : category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-[150px]">
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {statuses.map((status) => (
-                      <SelectItem key={status} value={status}>
-                        {status === 'all' ? 'All Status' : status.replace('-', ' ')}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Filter Pills */}
+        <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide animate-slide-up">
+          {filters.map((filter) => (
+            <button
+              key={filter}
+              onClick={() => setActiveFilter(filter)}
+              className={cn(
+                'px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all',
+                activeFilter === filter
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground'
+              )}
+            >
+              {filter === 'all' ? 'All' : filter.replace('-', ' ')}
+            </button>
+          ))}
+        </div>
 
-        {/* Inventory Table */}
-        <Card className="card-shadow animate-slide-up" style={{ animationDelay: '100ms' }}>
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-lg">Inventory Items</CardTitle>
-                <CardDescription>
-                  {filteredItems.length} item{filteredItems.length !== 1 ? 's' : ''} found
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                      Item Name
-                    </th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                      Category
-                    </th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                      Stock Level
-                    </th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                      Price
-                    </th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                      Status
-                    </th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                      Last Updated
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredItems.map((item, index) => (
-                    <tr
-                      key={item.id}
-                      className="border-b border-border/50 hover:bg-muted/30 transition-colors cursor-pointer animate-fade-in"
-                      style={{ animationDelay: `${index * 50}ms` }}
-                    >
-                      <td className="py-4 px-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
-                            <Package className="w-5 h-5 text-muted-foreground" />
-                          </div>
-                          <span className="font-medium text-foreground">{item.name}</span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-4">
-                        <Badge variant="outline" className="font-normal">
-                          {item.category}
-                        </Badge>
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="space-y-1.5 min-w-[120px]">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="font-medium text-foreground">{item.quantity}</span>
-                            <span className="text-muted-foreground">min: {item.minStock}</span>
-                          </div>
-                          <Progress
-                            value={getStockPercentage(item.quantity, item.minStock)}
-                            className={cn(
-                              'h-1.5',
-                              item.status === 'out-of-stock' && '[&>div]:bg-destructive',
-                              item.status === 'low-stock' && '[&>div]:bg-warning',
-                              item.status === 'in-stock' && '[&>div]:bg-success'
-                            )}
-                          />
-                        </div>
-                      </td>
-                      <td className="py-4 px-4 font-medium text-foreground">
-                        ${item.price.toFixed(2)}
-                      </td>
-                      <td className="py-4 px-4">
-                        <Badge className={cn('capitalize', getStatusStyles(item.status))}>
-                          {item.status.replace('-', ' ')}
-                        </Badge>
-                      </td>
-                      <td className="py-4 px-4 text-muted-foreground text-sm">
-                        {new Date(item.lastUpdated).toLocaleDateString()}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+        {/* Results Count */}
+        <p className="text-sm text-muted-foreground animate-fade-in">
+          {filteredItems.length} item{filteredItems.length !== 1 ? 's' : ''} found
+        </p>
 
-            {filteredItems.length === 0 && (
-              <div className="text-center py-12">
-                <Package className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                <p className="text-muted-foreground">No items found matching your criteria</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        {/* Items List */}
+        <div className="space-y-3">
+          {filteredItems.map((item, index) => (
+            <Card
+              key={item.id}
+              className="card-shadow animate-slide-up active:scale-[0.98] transition-transform"
+              style={{ animationDelay: `${index * 50}ms` }}
+            >
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center flex-shrink-0">
+                    <Package className="w-6 h-6 text-muted-foreground" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="font-semibold text-foreground">{item.name}</p>
+                        <p className="text-xs text-muted-foreground">{item.category}</p>
+                      </div>
+                      <Badge className={cn('text-[10px] shrink-0', getStatusStyles(item.status))}>
+                        {item.status.replace('-', ' ')}
+                      </Badge>
+                    </div>
+                    <div className="mt-3 space-y-1">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground">
+                          Stock: {item.quantity} / {item.minStock} min
+                        </span>
+                        <span className="font-semibold text-foreground">${item.price}</span>
+                      </div>
+                      <Progress
+                        value={getStockPercentage(item.quantity, item.minStock)}
+                        className={cn(
+                          'h-1.5',
+                          item.status === 'out-of-stock' && '[&>div]:bg-destructive',
+                          item.status === 'low-stock' && '[&>div]:bg-warning',
+                          item.status === 'in-stock' && '[&>div]:bg-success'
+                        )}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {filteredItems.length === 0 && (
+          <div className="text-center py-12 animate-fade-in">
+            <Package className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+            <p className="text-muted-foreground">No items found</p>
+          </div>
+        )}
+
+        {/* FAB */}
+        <Button
+          size="icon"
+          className="fixed bottom-20 right-4 w-14 h-14 rounded-full shadow-lg z-40 animate-scale-in"
+        >
+          <Plus className="w-6 h-6" />
+        </Button>
       </div>
-    </AppLayout>
+    </MobileLayout>
   );
 }
