@@ -8,9 +8,11 @@ interface MobileLayoutProps {
   children: ReactNode;
   title?: string;
   hideHeader?: boolean;
+  showBack?: boolean;
+  onBack?: () => void;
 }
 
-export function MobileLayout({ children, title, hideHeader }: MobileLayoutProps) {
+export function MobileLayout({ children, title, hideHeader, showBack, onBack }: MobileLayoutProps) {
   const { isAuthenticated } = useAuth();
 
   if (!isAuthenticated) {
@@ -19,7 +21,7 @@ export function MobileLayout({ children, title, hideHeader }: MobileLayoutProps)
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {!hideHeader && <MobileHeader title={title} />}
+      {!hideHeader && <MobileHeader title={title} showBack={showBack} onBack={onBack} />}
       <main className="flex-1 overflow-auto pb-20">
         {children}
       </main>
