@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { ShoppingCart, Truck, Clock, CheckCircle, ChevronRight } from 'lucide-react';
+import { ShoppingCart, Truck, Clock, CheckCircle, ChevronRight, QrCode } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { orders } from '@/data/sampleData';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
@@ -42,12 +42,23 @@ export function StaffOpenOrders() {
             <ShoppingCart className="w-4 h-4 text-info" />
             Open Orders
           </CardTitle>
-          <button 
-            onClick={() => navigate('/orders')}
-            className="text-xs text-primary flex items-center gap-1"
-          >
-            View All <ChevronRight className="w-3 h-3" />
-          </button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 text-xs gap-1"
+              onClick={() => navigate('/receive-order')}
+            >
+              <QrCode className="w-3 h-3" />
+              Scan
+            </Button>
+            <button 
+              onClick={() => navigate('/orders')}
+              className="text-xs text-primary flex items-center gap-1"
+            >
+              View All <ChevronRight className="w-3 h-3" />
+            </button>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="px-4 pb-4 space-y-2">

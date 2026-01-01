@@ -1,13 +1,16 @@
-import { Package, Bell } from 'lucide-react';
+import { Package, Bell, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { stockAlerts } from '@/data/sampleData';
 
 interface MobileHeaderProps {
   title?: string;
+  showBack?: boolean;
+  onBack?: () => void;
 }
 
-export function MobileHeader({ title }: MobileHeaderProps) {
+export function MobileHeader({ title, showBack, onBack }: MobileHeaderProps) {
   const { user } = useAuth();
   const alertCount = stockAlerts.filter(a => a.severity === 'critical').length;
 
@@ -15,9 +18,20 @@ export function MobileHeader({ title }: MobileHeaderProps) {
     <header className="sticky top-0 z-40 bg-card border-b border-border safe-area-top">
       <div className="flex items-center justify-between h-14 px-4">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-            <Package className="w-5 h-5 text-primary-foreground" />
-          </div>
+          {showBack ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="w-8 h-8 rounded-full"
+              onClick={onBack}
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+          ) : (
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+              <Package className="w-5 h-5 text-primary-foreground" />
+            </div>
+          )}
           <span className="font-semibold text-foreground">
             {title || 'Inventory'}
           </span>
